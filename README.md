@@ -32,7 +32,7 @@ The translator's main purpose is to contribute as an accessibility tool. With th
 
 4\. Segment image into blocks
 - Each block corresponds to a single letter
-- The image will be segmented into a grid of cells with sizes 2 \times D x 3 \times D  
+- The image will be segmented into a grid of cells with sizes 2·D X 3·D  
 
 5\. For each block, determine which letter it represents 
 
