@@ -25,7 +25,7 @@ The translator's main purpose is to contribute as an accessibility tool. With th
 - Point operation: Thresholding
 
 2\. Remove noise
--Convolution using median filter
+- Convolution using median filter
 
 3\. Determine diameter D of a braille circle 
 - It will be calculated as the median of the diamters of all the circles in the image plus a small Є
