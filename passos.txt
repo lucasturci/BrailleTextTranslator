@@ -1,0 +1,7 @@
+1. RGB para binário
+2. Filtro de média, pra tirar os noises. No final vai sobrar so umas bolinhas pretas, ou outras coisas feias atrapalhando. Depois vemos como tirar essas coisas feias
+3. Descobrir o diâmetro D de uma bolinha, pegar a média dos diâmetros da imagem binarizada
+4. Separar as letras da imagem, pegar grids em que cada célula tem lado D, e processar cada grid separadamente
+5. Agora é só ver se tem algum ponto preto dentro de uma célula do grid e top
+
+* Opcional, fazer se der certo: rotacionar a imagem pra poder reconhecer imagens rodadas
