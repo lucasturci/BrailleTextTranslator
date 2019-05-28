@@ -27,12 +27,12 @@ The translator's main purpose is to contribute as an accessibility tool. With th
 2\. Remove noise
 - Convolution using median filter
 
-3\. Determine diameter $D$ of a braille circle 
+3\. Determine diameter $$ D $$ of a braille circle 
 - It will be calculated as the median of the diamters of all the circles in the image plus a small Є
 
 4\. Segment image into blocks
 - Each block corresponds to a single letter
-- The image will be segmented into a grid of cells with sizes $2\timesD$ x $3\timesD$  
+- The image will be segmented into a grid of cells with sizes $2 \times D$ x $3\timesD$  
 
 5\. For each block, determine which letter it represents 
 
