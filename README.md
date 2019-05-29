@@ -21,7 +21,13 @@ The translator's main purpose is to contribute as an accessibility tool. With th
 ## Description of input images
 Given the program's main objetive, the input images that will be used are going to be any picture of a text written in braille that a person could've taken from their phone. As for the tests during the period of the developing of the code, the images used are going to be retrieved manually from the internet, trying to represent the real scenario in the most reliable way possible. 
 
+With that said, below there are two examples of possible input images. 
+
+<center><en><strong>Picture 1:</strong> Example image of braille text #1</en></center>
 ![example image of braille text #1](https://raw.githubusercontent.com/lucasturci/BrailleTextTranslator/master/images/1.jpg) 
+
+<center><en><strong>Picture 1:</strong> Example image of braille text #2</en></center>
+![example image of braille text #1](https://raw.githubusercontent.com/lucasturci/BrailleTextTranslator/master/images/2.gif) 
 
 ## Description of steps
 
