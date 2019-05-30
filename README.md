@@ -25,7 +25,7 @@ To reach this goal, the idea is to enhance a picture of a braille text until eve
 With this final binary image, we want to use it to match every symbol to an english letter. This corresponding letter will be added to the image, so that the translation is visual and therefore easy to understand. Also, it will be appended to a string, that will compose the returning text message, which could be used to generate an audio file, for example, providing more accessibility to our tool.  
 
 ### Description of input images
-Given the program's main objetive, the input images that will be used are going to be any picture of a text written in braille that a person could've taken from their phone. As for the tests during the period of the developing of the code, the images used are going to be retrieved manually from the internet, trying to represent the real scenario in the most reliable way possible. 
+Given the program's main objective, the input images that will be used are going to be any picture of a text written in braille that a person could've taken from their phone. As for the tests during the period of the development of the code, the images used are going to be retrieved manually from the internet, trying to represent the real scenario in the most reliable way possible. 
 
 With that said, below are two examples of possible input images. 
 
