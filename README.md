@@ -30,10 +30,10 @@ Given the program's main objetive, the input images that will be used are going 
 With that said, below are two examples of possible input images. 
 
 <i><strong>Picture 1:</strong> Example image of braille text #1</i><br>
-![example image of braille text #1](https://www.royalblind.org/sites/www.royalblind.org/files/SCOTTISH%20BRAIL%20PRESS%2031_1.jpg) 
+![example image of braille text #1](https://raw.githubusercontent.com/lucasturci/BrailleTextTranslator/master/images/1.jpg) 
 
 <i><strong>Picture 2:</strong> Example image of braille text #2</i><br>
-![example image of braille text #2](https://raw.githubusercontent.com/lucasturci/BrailleTextTranslator/master/images/2.gif) 
+![example image of braille text #2](https://raw.githubusercontent.com/lucasturci/BrailleTextTranslator/master/images/1.png) 
 
 ### Description of steps
 
