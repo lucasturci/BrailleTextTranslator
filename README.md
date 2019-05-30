@@ -37,19 +37,25 @@ With that said, below are two examples of possible input images.
 
 ### Description of steps
 
-1\. Transform original image into binary matrix
-- Point operation: Thresholding
+The input image will be transformed in a series of steps, one of which will make it binary using thresholding operation, so that the white pixels may correspond to the braille circle, and the black to the background (or vice versa). After that, the program will recognize the patterns of circles and output the corresponding english text. The steps are the following: 
 
-2\. Remove noise
-- Convolution using median filter
+1\. Remove noise
+- The first step is to remove the noise that may complicate the steps that will follow. This can be applied after the binary transformation, using morphological erosion, or before, using image filtering.
 
-3\. Determine diameter D of a braille circle 
+2\. Increase the image contrast
+- The shadows of the braille circles are the components that will be used to recognize this objects. With that in mind, the program will achieve better results with input images in which the shadows have more constrast than their neighbouring elements
+
+3\. Thresholding
+- Transform the input image in binary matrix, so that the background is black and braille circles are white (or vice versa).
+- Use thresholding operation 
+
+4\. Determine diameter D of a braille circle 
 - It will be calculated as the median of the diamters of all the circles in the image plus a small Є
 
-4\. Segment image into blocks
+5\. Segment image into blocks
 - Each block corresponds to a single letter
 - The image will be segmented into a grid of cells with sizes 2·D X 3·D  
 
-5\. For each block, determine which letter it represents 
+6\. For each block, determine which letter it represents 
 
-6\. Insert corresponding letter on top of the block it represents
+7\. Insert corresponding letter on top of the block it represents, and output final image
