@@ -154,9 +154,10 @@ def euclideanDistance(a, b):
 errors = []
 for i in range(len(histograms)):
 	errors.append(compare(desc, histograms[i]))
-	if compare(desc, histograms[i]) < 0.05: #if correlation between the two histograms is less than 0.05, paint it black
+	if len(comp[i]) > 25 or compare(desc, histograms[i]) < 0.05: #if correlation between the two histograms is less than 0.05, paint it black
 		paintBlack(comp[i][0][0], comp[i][0][1])
 
+print(errors)
 # This part will calculate the average radius
 radius = 0.0 
 for i in range(len(comp)):
