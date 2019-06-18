@@ -227,13 +227,9 @@ diam = int(diam)
 mat = dots_matrix.astype(np.uint8)
 printImage2(mat)
 
-
-# Reading train images
-zf.ZipFile('images/train.zip').extractall()
-
 images = []
 for i in range(1, 27):
-	images.append(imread("images/train/" + str(i) + ".png")[:,:,0])
+	images.append(imread("media/images/train/" + str(i) + ".png")[:,:,0])
 
 # Function to apply noise and generate more training images
 def gen_data(base_image, quantity, label, data, target, radius=4):
@@ -276,7 +272,6 @@ print("Accuracy for labelled test dataset:", accuracy_score(y_test, y_pred))
 
 from skimage.transform import resize
 
-# diam += 1
 wid = 4 * diam
 hei = 6 * diam
 
@@ -307,13 +302,21 @@ for i in range(N):
 
 		## big rect
 		tot2 = np.count_nonzero(dots_matrix[max(0, i-12*diam+1):min(i+6*diam+1, N), max(0, j-4*diam):min(M, j+8*diam)])
-		offset = diam
+		offset = diam//2
 		if tot2 == tot and i-hei+1 + offset >= 0 and i + 1 + offset <= N and j-offset >= 0 and j + wid - offset <= M:
 				# We found a pattern, cut it
 			pattern = dots_matrix[i-hei+1 + offset:i+1 + offset, j-offset:j+wid-offset]
 			# print(pattern)
 			print(pattern.shape)
-			letters.append((i-hei+1, j, find_letter(pattern)))
+			c = find_letter(pattern)
+			if c == '#' and i+offset + 2*diam < N:
+				pattern = dots_matrix[i-hei+1 + offset + 2 * diam: i+1+offset + 2*diam, j-offset:j+wid-offset]
+				c = find_letter(pattern)
+			if c == '#' and i+offset + 4*diam < N:
+				pattern = dots_matrix[i-hei+1 + offset + 4 * diam: i+1+offset + 4*diam, j-offset:j+wid-offset]
+				c = find_letter(pattern)
+
+			letters.append((i-hei+1, j, c))
 			dots_matrix[i-hei+1:i+1, j:j+wid] = 0
 
 # test_k = imageio.imread('test_k.png')
@@ -330,7 +333,7 @@ print(letters)
 
 img = Image.open(filename).convert('RGBA')
 d = ImageDraw.Draw(img)
-fnt = ImageFont.truetype('arial.ttf', 14)
+fnt = ImageFont.truetype('media/fonts/arial.ttf', 14)
 for x, y, c in letters:
 	d.text((y, x), "" + c, font=fnt, fill=(0, 0, 255, 255))
 

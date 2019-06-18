@@ -325,7 +325,6 @@ def find_letter(img):
 		tot = np.count_nonzero(img[i*2*diam:i*2*diam + 2*diam, j*2*diam:j*2*diam + 2*diam])
 		vec[k] = 1 if tot > 0.2*diam*diam else 0
 
-	print(vec)
 	if repr(vec) in alphabet: 
 		return alphabet[repr(vec)]
 	return '#'
@@ -345,11 +344,17 @@ for i in range(N):
 				# We found a pattern, cut it
 			pattern = dots_matrix[i-hei+1 + offset:i+1 + offset, j-offset:j+wid-offset]
 			# print(pattern)
-			print(pattern.shape)
-			letters.append((i-hei+1, j, find_letter(pattern)))
+			c = find_letter(pattern)
+			if c == '#' and i+offset + 2*diam < N:
+				pattern = dots_matrix[i-hei+1 + offset + 2 * diam: i+1+offset + 2*diam, j-offset:j+wid-offset]
+				c = find_letter(pattern)
+			if c == '#' and i+offset + 4*diam < N:
+				pattern = dots_matrix[i-hei+1 + offset + 4 * diam: i+1+offset + 4*diam, j-offset:j+wid-offset]
+				c = find_letter(pattern)
+
+			letters.append((i-hei+1, j, c))
 			dots_matrix[i-hei+1:i+1, j:j+wid] = 0
 
-print(letters)
 
 """## 5. Insert corresponding letter on top of the block it represents"""
 
