@@ -1,11 +1,51 @@
-import imageio
-import numpy as np
-import matplotlib.pyplot as plt
-import scipy
-from scipy import ndimage
 import sys
 import cv2
+import scipy
+import random
+import imageio
+import numpy as np
+import zipfile as zf
+import matplotlib.pyplot as plt
+
+from scipy import ndimage
+from imageio import imread
+from skimage.feature import hog
+from scipy.ndimage import shift
+from sklearn.metrics import accuracy_score
 from PIL import Image, ImageDraw, ImageFont
+from skimage.util import random_noise, invert
+from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import train_test_split
+
+alphabet =\
+{\
+	repr([1, 0, 0, 0, 0, 0]) : "a",\
+	repr([1, 0, 1, 0, 0, 0]) : "b",\
+	repr([1, 1, 0, 0, 0, 0]) : "c",\
+	repr([1, 1, 0, 1, 0, 0]) : "d",\
+	repr([1, 0, 0, 1, 0, 0]) : "e",\
+	repr([1, 1, 1, 0, 0, 0]) : "f",\
+	repr([1, 1, 1, 1, 0, 0]) : "g",\
+	repr([1, 0, 1, 1, 0, 0]) : "h",\
+	repr([0, 1, 1, 0, 0, 0]) : "i",\
+	repr([0, 1, 1, 1, 0, 0]) : "j",\
+	repr([1, 0, 0, 0, 1, 0]) : "k",\
+	repr([1, 0, 1, 0, 1, 0]) : "l",\
+	repr([1, 1, 0, 0, 1, 0]) : "m",\
+	repr([1, 1, 0, 1, 1, 0]) : "n",\
+	repr([1, 0, 0, 1, 1, 0]) : "o",\
+	repr([1, 1, 1, 0, 1, 0]) : "p",\
+	repr([1, 1, 1, 1, 1, 0]) : "q",\
+	repr([1, 0, 1, 1, 1, 0]) : "r",\
+	repr([0, 1, 1, 0, 1, 0]) : "s",\
+	repr([0, 1, 1, 1, 1, 0]) : "t",\
+	repr([1, 0, 0, 0, 1, 1]) : "u",\
+	repr([1, 0, 1, 0, 1, 1]) : "v",\
+	repr([0, 1, 1, 1, 0, 1]) : "w",\
+	repr([1, 1, 0, 0, 1, 1]) : "x",\
+	repr([1, 1, 0, 1, 1, 1]) : "y",\
+	repr([1, 0, 0, 1, 1, 1]) : "z",\
+}
 
 # normalizes image pixels between 0 and 255
 def normalize(img):
@@ -162,8 +202,8 @@ for i in range(len(histograms)):
 		print(compare(desc, histograms[i]))	
 		paintBlack(comp[i][0][0], comp[i][0][1])
 
-# This part will calculate the average radius
-radius = 0.0 
+# This part will calculate the average diameter
+diam = 0.0 
 for i in range(len(comp)):
 	lo = N
 	for pt in comp[i]: lo = min(lo, pt[0])
@@ -177,24 +217,123 @@ for i in range(len(comp)):
 	for pt in comp[i]: hi = max(hi, pt[1])
 
 	v = max(v, hi - lo + 1)
-	radius += v
+	diam += v
 
-radius /= len(comp)
-print(radius)
+diam //= len(comp)
+print(diam)
+diam = int(diam)
 
 # Plot segmented image
 mat = dots_matrix.astype(np.uint8)
 printImage2(mat)
 
-plt.show()
 
+# Reading train images
+zf.ZipFile('images/train.zip').extractall()
+
+images = []
+for i in range(1, 27):
+	images.append(imread("images/train/" + str(i) + ".png")[:,:,0])
+
+# Function to apply noise and generate more training images
+def gen_data(base_image, quantity, label, data, target, radius=4):
+	for i in range(quantity):
+		base_image = random_noise(base_image,mode='pepper')
+		size = base_image.shape
+
+		for i in range(size[0]):
+			for j in range(size[1]):
+				base_image[i, j] = 0 if base_image[i, j] < 1 else 1
+	    
+		base_image = ndimage.binary_erosion(base_image)
+
+		base_image = base_image.astype(np.uint8)
+		data.append(shift(base_image, [random.randint(-1*radius,1*radius), random.randint(-1*radius,1*radius)]))
+		target.append(label)
+
+X = []
+Y = []
+
+for i in range(26):
+	gen_data(invert(images[i]), 30 , i+1, X, Y, diam)
+
+x = []
+
+for i in X:
+	x.append(hog(i, block_norm='L2-Hys',  pixels_per_cell=(2,2), visualize=False))
+	#x.append(i.reshape((60*40)))
+
+x = np.asarray(x)
+y = np.asarray(Y)
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, stratify=y)
+
+clf = MLPClassifier(hidden_layer_sizes=(50,50), max_iter=1, tol=1e-3)
+clf.fit(x_train, y_train)
+y_pred = clf.predict(x_test)
+
+print("Accuracy for labelled test dataset:", accuracy_score(y_test, y_pred))
+
+from skimage.transform import resize
+
+# diam += 1
+wid = 4 * diam
+hei = 6 * diam
+
+def find_letter(img):
+	# resized = resize(img, (60,40))
+	# hog_img = hog(resized, block_norm='L2-Hys', pixels_per_cell=(2,2), visualize=False)
+	# letter = clf.predict([hog_img])
+	assert(img.shape == (hei, wid))
+	vec = [0 for _ in range(6)]
+	for k in range(6):
+		i = k//2
+		j = k%2
+		tot = np.count_nonzero(img[i*2*diam:i*2*diam + 2*diam, j*2*diam:j*2*diam + 2*diam])
+		vec[k] = 1 if tot > 0.2*diam*diam else 0
+
+	print(vec)
+	if repr(vec) in alphabet: 
+		return alphabet[repr(vec)]
+	return '#'
+
+letters = []
+
+for i in range(N):
+	for j in range(M-1, -1, -1):
+		if i-hei+1 < 0 or j+wid-1 >= M: continue
+		tot = np.count_nonzero(dots_matrix[i-hei+1:i+1, j:j+wid])
+		if tot == 0: continue
+
+		## big rect
+		tot2 = np.count_nonzero(dots_matrix[max(0, i-12*diam+1):min(i+6*diam+1, N), max(0, j-4*diam):min(M, j+8*diam)])
+		offset = diam
+		if tot2 == tot and i-hei+1 + offset >= 0 and i + 1 + offset <= N and j-offset >= 0 and j + wid - offset <= M:
+				# We found a pattern, cut it
+			pattern = dots_matrix[i-hei+1 + offset:i+1 + offset, j-offset:j+wid-offset]
+			# print(pattern)
+			print(pattern.shape)
+			letters.append((i-hei+1, j, find_letter(pattern)))
+			dots_matrix[i-hei+1:i+1, j:j+wid] = 0
+
+# test_k = imageio.imread('test_k.png')
+# plt.imshow(test_k)
+
+
+# resized = resize(test_k, (60,40))[:,:,0]
+
+# plt.imshow(resized, cmap="gray")
+
+print(letters)
 
 ## Draws the letters on top of the boxes
-positions = [(12, 15, 'a'), (80, 100, 'b')]
 
 img = Image.open(filename).convert('RGBA')
 d = ImageDraw.Draw(img)
-fnt = ImageFont.truetype('arial.ttf', 40)
-for x, y, c in positions:
-	d.text((x, y), "" + c, font=fnt, fill=(0, 0, 255, 255))
-img.show()
+fnt = ImageFont.truetype('arial.ttf', 14)
+for x, y, c in letters:
+	d.text((y, x), "" + c, font=fnt, fill=(0, 0, 255, 255))
+
+plt.figure(figsize=(16,8))
+plt.imshow(img)
+plt.show()
