@@ -5,6 +5,7 @@ import scipy
 from scipy import ndimage
 import sys
 import cv2
+from PIL import Image, ImageDraw, ImageFont
 
 # normalizes image pixels between 0 and 255
 def normalize(img):
@@ -122,15 +123,17 @@ histograms = [
 	for pts in comp
 ]
 
+sz = np.median([len(x) for x in comp])
 # histogram description of braille circle, it is calculated as weighted mean of the histograms of white regions, in which the weight is it's centrality
 desc = []
 for c in range(256):
 	desc.append(0)
 	sum = 0 # sums of weights
 	for i in range(len(comp)):
-		if len(comp[i]) > 25: continue
+		if abs(len(comp[i]) - sz) > sz: continue 
 		p, q = comp[i][0]
 		w = np.min([(p+1), (N - p+1), (q+1), (M - q + 1)]) # weight of the region, its centrality
+		w = w/(len(comp))
 		sum += w
 		desc[c] += w * histograms[i][c]
 	desc[c] /= sum
@@ -154,10 +157,11 @@ def euclideanDistance(a, b):
 errors = []
 for i in range(len(histograms)):
 	errors.append(compare(desc, histograms[i]))
-	if len(comp[i]) > 25 or compare(desc, histograms[i]) < 0.05: #if correlation between the two histograms is less than 0.05, paint it black
+	if compare(desc, histograms[i]) < 0 or euclideanDistance(desc, histograms[i]) > 1: #if correlation between the two histograms is less than 0.05, paint it black
+		print(euclideanDistance(desc, histograms[i]), end=' ')
+		print(compare(desc, histograms[i]))	
 		paintBlack(comp[i][0][0], comp[i][0][1])
 
-print(errors)
 # This part will calculate the average radius
 radius = 0.0 
 for i in range(len(comp)):
@@ -167,7 +171,6 @@ for i in range(len(comp)):
 	for pt in comp[i]: hi = max(hi, pt[0])
 
 	v = hi - lo + 1
-	print(hi - lo)
 	lo = M
 	for pt in comp[i]: lo = min(lo, pt[1])
 	hi = 0
@@ -184,3 +187,14 @@ mat = dots_matrix.astype(np.uint8)
 printImage2(mat)
 
 plt.show()
+
+
+## Draws the letters on top of the boxes
+positions = [(12, 15, 'a'), (80, 100, 'b')]
+
+img = Image.open(filename).convert('RGBA')
+d = ImageDraw.Draw(img)
+fnt = ImageFont.truetype('arial.ttf', 40)
+for x, y, c in positions:
+	d.text((x, y), "" + c, font=fnt, fill=(0, 0, 255, 255))
+img.show()
