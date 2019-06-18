@@ -191,12 +191,8 @@ def compare(a, b):
 def euclideanDistance(a, b):
 	return (np.sum((np.array(a) - np.array(b))**2)/256)**(1/2)
 
-errors = []
 for i in range(len(histograms)):
-	errors.append(compare(desc, histograms[i]))
 	if compare(desc, histograms[i]) < 0 or euclideanDistance(desc, histograms[i]) > 1: #if correlation between the two histograms is less than 0.05, paint it black
-		print(euclideanDistance(desc, histograms[i]), end=' ')
-		print(compare(desc, histograms[i]))	
 		paintBlack(comp[i][0][0], comp[i][0][1])
     
 # Plot segmented image
@@ -272,7 +268,7 @@ y = np.asarray(Y)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, stratify=y)
 
-clf = MLPClassifier(hidden_layer_sizes=(50,50), max_iter=1, tol=1e-3)
+clf = MLPClassifier(hidden_layer_sizes=(50,50), max_iter=500, tol=1e-3)
 clf.fit(x_train, y_train)
 y_pred = clf.predict(x_test)
 
