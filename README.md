@@ -37,25 +37,41 @@ With that said, below are two examples of possible input images.
 
 The input image will be transformed in a series of steps, one of which will make it binary using thresholding operation, so that the white pixels may correspond to the braille circle, and the black to the background (or vice versa). After that, the program will recognize the patterns of circles and output the corresponding english text. The steps are the following: 
 
-1\. Image enhancement
-1\.1\. Remove noise
-- The first step is to remove the noise that may complicate the steps that will follow. This can be applied after the binary transformation, using morphological erosion, or before, using image filtering.
 
-2\. Image segmentation
-- The shadows of the braille circles are the components that will be used to recognize this objects. With that in mind, the program will filter the pixels that have more contrast with their neighbourhood.
-
-2\.1\. Thresholding
-- Transform the input image in binary matrix, so that the background is black and braille circles are white (or vice versa).
-- Use thresholding operation 
-
-2\.3\. Ignore unwanted white regions
-- This step will recognize which regions don't correspond to braille circles, using comparison between circle's colour description
-
-3\. Determine diameter D of a braille circle 
-- It will be calculated as the median of the diameters of all the circles in the image
-
-4\. Segment image into blocks and determine which letter each one represents
-- Each block corresponds to a single letter
-- The image will be segmented into a grid of cells with sizes 2·D X 3·D  
-
-5\. Insert corresponding letter on top of the block it represents, and output final image
+<ol>
+	<li><h3>Image enhancement</h3> 
+		<ul>
+			<li>The first step is to remove the noise that may complicate the steps that will follow. This can be applied after the binary transformation, using morphological erosion, or before, using image filtering.</li>
+		</ul>
+	</li>
+	<li><h3>Image segmentation</h3> 
+		<ul>
+			<li>The shadows of the braille circles are the components that will be used to recognize this objects. With that in mind, the program will filter the pixels that have more contrast with their neighbourhood. </li>
+		</ul>
+		<ol>
+			<li><h5>Thresholding:</h5>
+				<ul>
+					<li>Transform the input image in binary matrix, so that the background is black and braille circles are white (or vice versa).</li>
+					<li>Use thresholding operation </li>
+				</ul>
+			<li><h5>Ignore unwanted white regions</h5></li>
+				<ul>
+				<li>This step will recognize which regions don't correspond to braille circles, using comparison between circle's colour description</li>
+				</ul>
+		</ol>
+	</li>
+	<li><h3>Determine diameter D of a braille circle</h3>
+		<ul>
+			<li>It will be calculated as the median of the diameters of all the circles in the image</li>
+		</ul>
+	<li><h3>Segment image into blocks and determine which letter each one represents</h3>
+		<ul>
+			<li>The image will be segmented into a grid of cells with sizes 4D X 6D, when D corresponds to the average diameter of a braille circle.</li>
+			<li>Each block will correspond to a single letter</li>
+		</ul>
+	</li>
+	<li><h3>Insert corresponding letter on top of the block it represents, and output final image</h3></li>
+		<ul>
+			<li>The final output image will be generate as the inicial input image with printed blue english letters on top of each braille symbol.</li>
+		</ul>
+</ol>
