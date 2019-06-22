@@ -62,7 +62,7 @@ def filter(I, n):
 
 	for i in range(N):
 		for j in range(M):
-			sub = I[i+m:(i+m+n), j+m:(j+m+n)]
+			sub = I[i:(i+n), j:(j+n)]
 			med = np.median(np.ravel(sub)) # gets median
 			J[i, j] = abs(I[i+m, j+m] - med) # applies the difference
 	return J
@@ -76,7 +76,7 @@ def MeanFilter(I, n):
 	for	i in range(N):
 		for j in range(M):
 			# copies the matrix to sub
-			sub = I[i+m:(i+m+n), j+m:(j+m+n)]
+			sub = I[i:(i+n), j:(j+n)]
 			J[i, j] = np.mean(np.ravel(sub)) # get mean of the linearized list
 	return J
 
@@ -86,16 +86,20 @@ filename = "media/images/" + str(input()).rstrip() # filename of the input image
 image = imageio.imread(filename)
 matrix = np.array(image, copy=True, dtype=np.float)
 
-N, M, _ = matrix.shape
+if len(matrix.shape) == 3:
+	N, M, _ = matrix.shape
+else:
+	N, M = matrix.shape
 
 sys.setrecursionlimit(10 * N * M)
 
-# Transform RGB to gray scale
-for i in range(N):
-	for j in range(M):
-		matrix[i, j, 0] = matrix[i, j, 0] * 0.2989 + matrix[i, j, 1] * 0.5870 + matrix[i, j, 2] * 0.1140
-    
-matrix = matrix[:, :, 0:1].squeeze()
+if len(matrix.shape) == 3:
+	# Transform RGB to gray scale
+	for i in range(N):
+		for j in range(M):
+			matrix[i, j, 0] = matrix[i, j, 0] * 0.2989 + matrix[i, j, 1] * 0.5870 + matrix[i, j, 2] * 0.1140
+	    
+	matrix = matrix[:, :, 0:1].squeeze()
 
 # Plot original image
 mat = matrix.astype(np.uint8)
@@ -175,6 +179,9 @@ for c in range(256):
 		desc[c] += w * histograms[i][c]
 	desc[c] /= sum
 
+print(histograms[2])
+print(desc)
+
 # Flood fill algorithm to paint unwanted white regions
 def paintBlack(i, j):
 	dots_matrix[i, j] = 0
@@ -191,10 +198,13 @@ def compare(a, b):
 def euclideanDistance(a, b):
 	return (np.sum((np.array(a) - np.array(b))**2)/256)**(1/2)
 
+errors = []
 for i in range(len(histograms)):
-	if compare(desc, histograms[i]) < 0 or euclideanDistance(desc, histograms[i]) > 1: #if correlation between the two histograms is less than 0.05, paint it black
+	errors.append((compare(desc, histograms[i]), euclideanDistance(desc, histograms[i])))
+	if compare(desc, histograms[i]) < 0 or euclideanDistance(desc, histograms[i]) > 2: #if correlation between the two histograms is less than 0.05, paint it black
 		paintBlack(comp[i][0][0], comp[i][0][1])
     
+print(errors)
 # Plot segmented image
 mat = dots_matrix.astype(np.uint8)
 printImage(mat)
@@ -204,6 +214,7 @@ printImage(mat)
 # This part will calculate the average diameter
 diam = 0.0 
 for i in range(len(comp)):
+	if abs(len(comp[i]) - sz) > sz: continue 
 	lo = N
 	for pt in comp[i]: lo = min(lo, pt[0])
 	hi = 0
